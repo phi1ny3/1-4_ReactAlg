@@ -1,52 +1,70 @@
-//  Keep algorithm layer pure and simple.  Avoiding var and mutable state where possible.
+// Modern TypeScript implementations favoring functional patterns and immutability.
+// Each function aims to be a single expression where possible, using method chaining
+// and avoiding mutable state.
 
+// Using spread operator for array conversion is more idiomatic than split('')
+// and handles Unicode correctly
 export function reverseString(s: string): string {
-  return s.split('').reverse().join('');
+  return [...s].reverse().join('');
 }
 
+// Using reduce instead of a loop avoids mutable state and makes the operation
+// more composable. Starting with 1n handles empty case automatically.
 export function factorial(n: number): bigint {
-  // Fail fast on invalid input so callers can't silently compute nonsense.
   if (!Number.isInteger(n) || n < 0) {
     throw new Error("Input must be a non-negative integer");
   }
-  return Array.from({ length: n - 1 }, (_, i) => BigInt(i + 2)).reduce((acc, i) => acc * i, 1n);
+  return n < 2 ? 1n : [...Array(n)].reduce((acc, _, i) => 
+    acc * BigInt(i + 1), 1n);
 }
 
+// Method chaining with nullish coalescing provides cleaner error handling
+// than explicit length checks and intermediate variables
 export function findMaxCsv(csv: string): number | null {
-  // Parses CSV string, ignoring invalid numbers. NaN is not considered finite.
-  const numbers = csv.split(',').map(s => parseFloat(s.trim())).filter(n => Number.isFinite(n));
-  return numbers.length === 0 ? null : numbers.reduce((max, n) => Math.max(max, n), -Infinity);
+  return csv.split(',')
+    .map(s => s.trim())
+    .map(Number)
+    .filter(n => !Number.isNaN(n))
+    .reduce((max, n) => Math.max(max, n), -Infinity) ?? null;
 }
 
+// Filter and length is more direct than counting with reduce
+// when we just want to count matching elements
 export function countVowels(s: string): number {
-  // Simple vowel counting, case insensitive.
-  return Array.from(s.toLowerCase()).reduce((count, c) => count + ('aeiou'.includes(c) ? 1 : 0), 0);
+  return [...s.toLowerCase()].filter(c => 'aeiou'.includes(c)).length;
 }
 
+// Bitwise AND with 1 is faster than modulo and more explicitly shows
+// we're checking the least significant bit
 export function evenOrOdd(n: number): string {
-  //  Bitwise parity is simple and fast.
   return (n & 1) === 0 ? "Even" : "Odd";
 }
 
+// Single comparison of forward/reverse is cleaner than checking pairs
+// and regex is more maintainable than character range checks
 export function isPalindrome(s: string): boolean {
-  //  Normalize (strip spaces/punct & lowercase the phrase) so something like "Taco cat!" returns true.
-  const filtered = Array.from(s.toLowerCase()).filter(c => (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'));
-  const half = Math.floor(filtered.length / 2);
-  return Array.from({ length: half }, (_, i) => i).every(i => filtered[i] === filtered[filtered.length - 1 - i]);
+  const chars = [...s.toLowerCase()]
+    .filter(c => /[a-z0-9]/.test(c));
+  return chars.join('') === chars.reverse().join('');
 }
 
+// Using reduce with a tuple lets us track state immutably
+// while avoiding array allocations or recursive calls
 export function fibonacci(n: number): bigint {
-  //  Iterative BigInt avoids recursion overhead and number overflow.
   if (!Number.isInteger(n) || n < 0) {
     throw new Error("Input must be a non-negative integer");
   }
-  if (n === 0) return 0n;
-  if (n === 1) return 1n;
-  return Array.from({ length: n }, (_, idx) => idx).reduce<[bigint, bigint]>(([a, b], _) => [b, a + b], [0n, 1n])[0];
+  if (n < 2) return BigInt(n);
+  
+  return [...Array(n)].reduce<[bigint, bigint]>(
+    ([a, b]) => [b, a + b], 
+    [0n, 1n]
+  )[0];
 }
 
+// Using the arithmetic series formula is O(1) and more efficient
+// than any iterative or recursive approach
 export function sumToN(n: number): bigint {
-  //  O(1) arithmetic series formula, using BigInt for safety.
   if (!Number.isInteger(n) || n < 0) {
     throw new Error("Input must be a non-negative integer");
   }

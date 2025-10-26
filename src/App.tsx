@@ -1,111 +1,93 @@
-// src/App.tsx
-import React from 'react';
-import AlgorithmCard from './components/AlgorithmCard';
-import { STR } from './strings';
 import './App.css';
-
-// Why: Keep algorithms pure — they never touch UI.
+import AlgorithmCard from './components/AlgorithmCard';
 import {
-  reverseString, factorial, findMaxCsv, countVowels, evenOrOdd,
-  isPalindrome, fibonacci, sumToN
+  reverseString, factorial, findMaxCsv, countVowels, 
+  evenOrOdd, isPalindrome, fibonacci, sumToN
 } from './Algorithms';
 
 function App() {
-
   return (
     <div className="app">
       <header className="app-header">
-        <h1>{STR.app_name}</h1>
+        <h1>Algorithm Playground</h1>
       </header>
 
       <main className="app-content">
-        {/* Reverse a String */}
         <AlgorithmCard
-          title={STR.title_reverse}
-          hint={STR.hint_reverse}
-          onRun={(input) => input ? reverseString(input) : STR.error_enter_text}
-        />
-
-        {/* Palindrome */}
-        <AlgorithmCard
-          title={STR.title_palindrome}
-          hint={STR.hint_palindrome}
-          onRun={(input) => {
-            if (!input.trim()) return STR.error_enter_text;
-            return isPalindrome(input) ? STR.yes_palindrome : STR.no_palindrome;
+          name="Reverse a String"
+          example="hello"
+          run={input => {
+            if (!input) throw new Error("Please enter some text");
+            return reverseString(input);
           }}
         />
 
-        {/* Factorial */}
         <AlgorithmCard
-          title={STR.title_factorial}
-          hint={STR.hint_factorial}
-          onRun={(input) => {
-            const n = parseInt(input);
-            if (!Number.isFinite(n) || n < 0) return STR.error_nonnegative;
-            try {
-              return factorial(n).toString();
-            } catch (e: any) {
-              return e?.message ?? 'Error';
-            }
+          name="Check Palindrome"
+          example="racecar"
+          run={input => {
+            if (!input.trim()) throw new Error("Please enter some text");
+            return isPalindrome(input) ? "Yes, it's a palindrome!" : "No, not a palindrome.";
           }}
         />
 
-        {/* Fibonacci */}
         <AlgorithmCard
-          title={STR.title_fibonacci}
-          hint={STR.hint_fibonacci}
-          onRun={(input) => {
-            const n = parseInt(input);
-            if (!Number.isFinite(n) || n < 0) return STR.error_nonnegative;
-            if (n > 5000) return 'n too large';
-            try {
-              return fibonacci(n).toString();
-            } catch (e: any) {
-              return e?.message ?? 'Error';
-            }
+          name="Factorial Calculator"
+          example="5"
+          run={input => {
+            const n = Number(input);
+            if (!Number.isInteger(n) || n < 0) throw new Error("Enter a non-negative integer");
+            return factorial(n).toString();
           }}
         />
 
-        {/* Sum to N */}
         <AlgorithmCard
-          title={STR.title_sum_to_n}
-          hint={STR.hint_sum_to_n}
-          onRun={(input) => {
-            const n = parseInt(input);
-            if (!Number.isFinite(n) || n < 0) return STR.error_nonnegative;
-            try {
-              return sumToN(n).toString();
-            } catch (e: any) {
-              return e?.message ?? 'Error';
-            }
+          name="Fibonacci Number (nth)"
+          example="6"
+          run={input => {
+            const n = Number(input);
+            if (!Number.isInteger(n) || n < 0) throw new Error("Enter a non-negative integer");
+            if (n > 5000) throw new Error("n is too large");
+            return fibonacci(n).toString();
           }}
         />
 
-        {/* Find Max CSV */}
         <AlgorithmCard
-          title={STR.title_max_csv}
-          hint={STR.hint_max_csv}
-          onRun={(input) => {
+          name="Sum of Numbers 1 to N"
+          example="10"
+          run={input => {
+            const n = Number(input);
+            if (!Number.isInteger(n) || n < 0) throw new Error("Enter a non-negative integer");
+            return sumToN(n).toString();
+          }}
+        />
+
+        <AlgorithmCard
+          name="Find Max Number"
+          example="3, 7, 2, 9"
+          run={input => {
             const max = findMaxCsv(input);
-            return max != null ? max.toString() : STR.error_invalid_csv;
+            if (max === null) throw new Error("Enter a valid list of numbers");
+            return max.toString();
           }}
         />
 
-        {/* Count Vowels */}
         <AlgorithmCard
-          title={STR.title_vowels}
-          hint={STR.hint_vowels}
-          onRun={(input) => countVowels(input).toString()}
+          name="Count Vowels"
+          example="javascript"
+          run={input => {
+            if (!input) throw new Error("Please enter some text");
+            return countVowels(input).toString();
+          }}
         />
 
-        {/* Even or Odd */}
         <AlgorithmCard
-          title={STR.title_even_odd}
-          hint={STR.hint_even_odd}
-          onRun={(input) => {
-            const n = parseInt(input);
-            return !Number.isFinite(n) ? STR.error_invalid_number : evenOrOdd(n);
+          name="Even or Odd"
+          example="42"
+          run={input => {
+            const n = Number(input);
+            if (!Number.isInteger(n)) throw new Error("Enter a valid number");
+            return evenOrOdd(n);
           }}
         />
       </main>
