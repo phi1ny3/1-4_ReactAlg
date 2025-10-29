@@ -1,7 +1,3 @@
-// Modern TypeScript implementations favoring functional patterns and immutability.
-// Each function aims to be a single expression where possible, using method chaining
-// and avoiding mutable state.
-
 // Using spread operator for array conversion is more idiomatic than split('')
 // and handles Unicode correctly
 export function reverseString(s: string): string {
